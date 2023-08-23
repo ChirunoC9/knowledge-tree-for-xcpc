@@ -55,66 +55,75 @@ private:
     int count;
 };
 
-class disjoint_set_union {
-public:
-    explicit disjoint_set_union(int __n)
-        : __leader(__n, -1), __remain_sets_count(__n) {
+class disjoin_set_union {
+private:
+    std::vector<int> dad;
+    std::size_t set_count;
 
+public:
+    explicit disjoin_set_union(std::size_t __size) 
+        : dad(__size, -1), set_count(__size) {
+        
     }
-    
-    int get_leader(int __x) {
-        assert(__vertex_in_range(__x));
-        return __get_leader(__x);
+
+private:
+    int __get_leader(int __x) {
+        if (dad[__x] <= 1) {
+            return __x;
+        }
+        return dad[__x] = __get_leader(dad[__x]);
     }
-    
-    // merge_a_to_b
-    bool merge_to(int __a, int __b) {
-        assert(__vertex_in_range(__a));
-        assert(__vertex_in_range(__b));
-        __a = get_leader(__a);
-        __b = get_leader(__b);
-        if (__a == __b)
+
+    int __get_count(int __x) {
+        return -dad[__get_leader(__x)];
+    }
+
+    template <typename __compare>
+    bool __merge_if(int __a, int __b, const __compare &comp) {
+        __a = __get_leader(__a);
+        __b = __get_leader(__b);
+        if (!comp(__a, __b)) {
+            std::swap(__a, __b);
+        }
+        if (!comp(__a, __b)) {
             return false;
-        __merge_a_to_b(__a, __b);
+        }
+        dad[__a] += dad[__b];
+        dad[__b] = __a;
+        -- set_count;
         return true;
     }
 
-    int get_remain_sets_count() const noexcept {
-        return __remain_sets_count;
+public:
+    int get_leader(int __x) {
+        assert(0 <= __x && __x < (int)dad.size());
+        return __get_leader(__x);
     }
 
-    int get_set_size(int __x) {
-        assert(__vertex_in_range(__x));
-        auto __x_leader = get_leader(__x);
-        return -__leader[__x_leader];
+    int get_count() const {
+        return set_count;
     }
 
-    void assign(int __new_size) {
-        __leader.assign(__new_size, -1);
-        __remain_sets_count = __new_size;
+    int get_count(int __x) {
+        assert(0 <= __x && __x < (int)dad.size());
+        return __get_count(__x);
     }
 
-private:
-    // bool __vertex_in_range(int __x) const {
-    // }
-
-    bool __vertex_in_range(int __x) const {
-        return 0 <= __x && __x < (int)__leader.size();
+    template <typename __compare>
+    bool merge_if(int __a, int __b, const __compare &__comp) {
+        assert(0 <= __a && __a < (int)dad.size());
+        assert(0 <= __b && __b < (int)dad.size());
+        return __merge_if(__a, __b, __comp);
     }
 
-    int __get_leader(int __x) {
-        if (__leader[__x] <= -1) 
-            return __x;
-        return __leader[__x] = __get_leader(__leader[__x]);
+    bool merge(int __a, int __b) {
+        assert(0 <= __a && __a < (int)dad.size());
+        assert(0 <= __b && __b < (int)dad.size());
+        return __merge_if(__a, __b, std::less<int>{});
     }
 
-    void __merge_a_to_b(int __a, int __b) {
-        __leader[__b] += __leader[__a];
-        __leader[__a] = __b;
-        -- __remain_sets_count;
+    void assign(std::size_t __size) {
+        dad.assign(__size, -1);
+        set_count = __size;
     }
-
-private:
-    std::vector<int> __leader;
-    int __remain_sets_count;
 };
