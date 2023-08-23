@@ -67,6 +67,10 @@ public:
     }
 
 private:
+    bool __in_range(int __x) const {
+        return 0 <= __x && __x < dad.size();
+    }
+
     int __get_leader(int __x) {
         if (dad[__x] <= 1) {
             return __x;
@@ -96,7 +100,7 @@ private:
 
 public:
     int get_leader(int __x) {
-        assert(0 <= __x && __x < (int)dad.size());
+        assert(__in_range(__x));
         return __get_leader(__x);
     }
 
@@ -105,21 +109,27 @@ public:
     }
 
     int get_count(int __x) {
-        assert(0 <= __x && __x < (int)dad.size());
+        assert(__in_range(__x));
         return __get_count(__x);
     }
 
     template <typename __compare>
     bool merge_if(int __a, int __b, const __compare &__comp) {
-        assert(0 <= __a && __a < (int)dad.size());
-        assert(0 <= __b && __b < (int)dad.size());
+        assert(__in_range(__a));
+        assert(__in_range(__b));
         return __merge_if(__a, __b, __comp);
     }
 
     bool merge(int __a, int __b) {
-        assert(0 <= __a && __a < (int)dad.size());
-        assert(0 <= __b && __b < (int)dad.size());
+        assert(__in_range(__a));
+        assert(__in_range(__b));
         return __merge_if(__a, __b, std::less<int>{});
+    }
+
+    bool is_same(int __a, int __b) {
+        assert(__in_range(__a));
+        assert(__in_range(__b));
+        return __get_leader(__a) == __get_leader(__b);        
     }
 
     void assign(std::size_t __size) {
