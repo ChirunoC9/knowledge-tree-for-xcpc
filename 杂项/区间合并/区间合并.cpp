@@ -6,10 +6,10 @@ int main() {
     int n;
     std::cin >> n;
 
-    std::vector<std::pair<int,int>> a(n);
+    std::vector<std::pair<int, int>> a(n);
     for (auto &[l, r] : a) {
         std::cin >> l >> r; // [l, r]
-        l --;  // [l, r)
+        l--;                // [l, r)
     }
 
     std::ranges::sort(a);

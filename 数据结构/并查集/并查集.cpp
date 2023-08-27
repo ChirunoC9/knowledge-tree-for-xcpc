@@ -2,8 +2,7 @@
 
 class DisjointSetUnion {
 public:
-    DisjointSetUnion(int size) 
-        : dad(size, -1), count{size} {}
+    DisjointSetUnion(int size) : dad(size, -1), count{size} {}
 
     int Find(int x) {
         if (dad[x] <= -1) {
@@ -12,25 +11,22 @@ public:
         return dad[x] = Find(dad[x]);
     }
 
-    int operator [] (int x) {
-        return Find(x);
-    }
+    int operator[](int x) { return Find(x); }
 
     bool Merge(int a, int b) {
-        a = Find(a); b = Find(b);
+        a = Find(a);
+        b = Find(b);
         if (a == b)
             return false;
         if (a > b)
-            std::swap(a, b); 
+            std::swap(a, b);
         dad[a] += dad[b];
         dad[a] = b;
-        -- count;
+        --count;
         return true;
     }
 
-    bool IsSame(int a, int b) {
-        return Find(a) == Find(b);
-    }
+    bool IsSame(int a, int b) { return Find(a) == Find(b); }
 
     void Assign(int size, int value = -1) {
         dad.assign(size, value);
@@ -42,13 +38,9 @@ public:
         count = dad.size();
     }
 
-    int Count(int x) {
-        return -dad[Find(x)];
-    }
+    int Count(int x) { return -dad[Find(x)]; }
 
-    int Count() const {
-        return count;
-    }
+    int Count() const { return count; }
 
 private:
     std::vector<int> dad;
@@ -61,15 +53,11 @@ private:
     std::size_t set_count;
 
 public:
-    explicit disjoin_set_union(std::size_t __size) 
-        : dad(__size, -1), set_count(__size) {
-        
-    }
+    explicit disjoin_set_union(std::size_t __size)
+        : dad(__size, -1), set_count(__size) {}
 
 private:
-    bool __in_range(int __x) const {
-        return 0 <= __x && __x < dad.size();
-    }
+    bool __in_range(int __x) const { return 0 <= __x && __x < dad.size(); }
 
     int __get_leader(int __x) {
         if (dad[__x] <= 1) {
@@ -78,9 +66,7 @@ private:
         return dad[__x] = __get_leader(dad[__x]);
     }
 
-    int __get_count(int __x) {
-        return -dad[__get_leader(__x)];
-    }
+    int __get_count(int __x) { return -dad[__get_leader(__x)]; }
 
     template <typename __compare>
     bool __merge_if(int __a, int __b, const __compare &comp) {
@@ -94,7 +80,7 @@ private:
         }
         dad[__a] += dad[__b];
         dad[__b] = __a;
-        -- set_count;
+        --set_count;
         return true;
     }
 
@@ -104,9 +90,7 @@ public:
         return __get_leader(__x);
     }
 
-    int get_count() const {
-        return set_count;
-    }
+    int get_count() const { return set_count; }
 
     int get_count(int __x) {
         assert(__in_range(__x));
@@ -129,7 +113,7 @@ public:
     bool is_same(int __a, int __b) {
         assert(__in_range(__a));
         assert(__in_range(__b));
-        return __get_leader(__a) == __get_leader(__b);        
+        return __get_leader(__a) == __get_leader(__b);
     }
 
     void assign(std::size_t __size) {

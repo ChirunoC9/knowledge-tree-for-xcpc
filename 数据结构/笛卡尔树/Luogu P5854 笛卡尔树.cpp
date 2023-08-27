@@ -1,8 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template <typename Key, typename Value>
-struct CartesianTree {
+template <typename Key, typename Value> struct CartesianTree {
     struct Node {
         Node(int lc = -1, int rc = -1) : key(), value(), lc(lc), rc(rc) {}
         Node(Key key, Value value, int lc = -1, int rc = -1)
@@ -18,10 +17,10 @@ struct CartesianTree {
         std::ranges::stable_sort(tr, key_cmp, &Node::val);
         std::vector<int> stk(tr.size());
         int top = 0;
-        for (int i = 0; i < tr.size(); i ++) {
+        for (int i = 0; i < tr.size(); i++) {
             int k = top - 1;
             while (k >= 0 && val_cmp(tr[i].value, tr[stk[k]].value)) {
-                k --;
+                k--;
             }
             if (k >= 0) {
                 tr[stk[k]].lc = i;
@@ -29,7 +28,7 @@ struct CartesianTree {
             if (k + 1 < top) {
                 tr[i].rc = stk[k + 1];
             }
-            stk[++ k] = i;
+            stk[++k] = i;
             top = k + 1;
         }
         root = stk[0];

@@ -6,14 +6,16 @@
 //     #define debug(...)
 // #endif
 
-template <typename T, typename Compare = std::greater<T>, template <typename E, typename Alloc = std::allocator<E>> typename Container = std::vector>
+template <typename T, typename Compare = std::greater<T>,
+          template <typename E, typename Alloc = std::allocator<E>>
+          typename Container = std::vector>
 using PriorityQueue = std::priority_queue<T, Container<T>, Compare>;
-template <typename T, template <typename E, typename Alloc = std::allocator<E>> typename Container = std::vector>
+template <typename T, template <typename E, typename Alloc = std::allocator<E>>
+                      typename Container = std::vector>
 using Stack = std::stack<T, Container<T>>;
 using i64 = int64_t;
 
-template <typename T>
-constexpr T inf = std::numeric_limits<T>::max() / 2;
+template <typename T> constexpr T inf = std::numeric_limits<T>::max() / 2;
 
 struct Macro {};
 template <> struct std::ranges::view_interface<Macro> {
@@ -22,15 +24,13 @@ template <> struct std::ranges::view_interface<Macro> {
 
 using namespace std;
 
-template <typename T>
-struct BaseChthollyTree {
+template <typename T> struct BaseChthollyTree {
     int L, R;
-    std::map<int,T> mp;  // 区间开始 : 数据
+    std::map<int, T> mp; // 区间开始 : 数据
 
     // [l, r)
     BaseChthollyTree(int l, int r, const T &init_val)
-        : L(l), R(r), mp{ {l - 1, init_val}, {r, init_val} } {
-    }
+        : L(l), R(r), mp{{l - 1, init_val}, {r, init_val}} {}
 
     void Split(int x) {
         auto it = std::prev(mp.upper_bound(x));
@@ -39,7 +39,8 @@ struct BaseChthollyTree {
 
     // 删除 [l, r - 1], 建立新区间
     void Assign(int l, int r, const T &v) {
-        Split(l); Split(r);
+        Split(l);
+        Split(r);
         auto it = mp.find(l);
         while (it->first != r) {
             it = mp.erase(it);
@@ -52,19 +53,22 @@ struct BaseChthollyTree {
 };
 
 struct ChthollyTree : BaseChthollyTree<i64> {
-    ChthollyTree(int l, int r, const i64 &init_val) : BaseChthollyTree<i64>(l, r, init_val) {}
+    ChthollyTree(int l, int r, const i64 &init_val)
+        : BaseChthollyTree<i64>(l, r, init_val) {}
 
     void Add(int l, int r, i64 k) {
-        Split(l); Split(r);
+        Split(l);
+        Split(r);
         for (auto it = mp.find(l); it->first < r; it = std::next(it)) {
             it->second += k;
         }
     }
 
     i64 GetRankFromMin(int l, int r, int kth) {
-        Split(l); Split(r);
-        
-        std::vector<std::pair<i64,int>> v;
+        Split(l);
+        Split(r);
+
+        std::vector<std::pair<i64, int>> v;
         for (auto it = mp.find(l); it->first < r; it = std::next(it)) {
             v.emplace_back(it->second, next(it)->first - it->first);
         }
@@ -74,7 +78,7 @@ struct ChthollyTree : BaseChthollyTree<i64> {
             }
             return a.second < b.second;
         });
-        
+
         for (auto [val, cnt] : v) {
             kth -= cnt;
             if (kth <= 0) {
@@ -96,7 +100,8 @@ struct ChthollyTree : BaseChthollyTree<i64> {
             return ret;
         };
 
-        Split(l); Split(r);
+        Split(l);
+        Split(r);
         i64 ret = 0;
         for (auto it = mp.find(l); it->first < r; it = std::next(it)) {
             int l = it->first, r = std::next(it)->first;
@@ -121,11 +126,11 @@ auto std::ranges::view_interface<Macro>::Main() -> void {
     };
 
     ChthollyTree odt(1, n + 1, i64(0));
-    for (int i = 1; i <= n; i ++) {
+    for (int i = 1; i <= n; i++) {
         odt.mp[i] = (GetRnd() % vmax) + 1;
     }
 
-    for (int _ = 1; _ <= q; _ ++) {
+    for (int _ = 1; _ <= q; _++) {
         int opt, l, r;
         i64 x, y;
 
@@ -165,7 +170,7 @@ auto main() -> int32_t {
     int test = 1;
     // std::cin >> test;
 
-    for (int rp = 1; test --> 0; rp ++) {
+    for (int rp = 1; test-- > 0; rp++) {
         std::ranges::view_interface<Macro>::Main();
     }
 }

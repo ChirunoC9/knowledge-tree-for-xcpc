@@ -113,4 +113,9 @@
 	"clangd.path": "c:\\Users\\Ciel\\AppData\\Roaming\\Code\\User\\globalStorage\\llvm-vs-code-extensions.vscode-clangd\\install\\16.0.2\\clangd_16.0.2\\bin\\clangd.exe",
 	"C_Cpp.autocomplete": "default",
 	// "files.maxMemoryForLargeFilesMB": "",
+
+	"[cpp]": {
+		"editor.defaultFormatter": "xaver.clang-format",
+		"editor.formatOnSave": true,
+	},
 }
