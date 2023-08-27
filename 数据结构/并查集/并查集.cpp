@@ -1,123 +1,88 @@
 #include <bits/stdc++.h>
 
-class DisjointSetUnion {
-public:
-    DisjointSetUnion(int size) : dad(size, -1), count{size} {}
-
-    int Find(int x) {
-        if (dad[x] <= -1) {
-            return x;
-        }
-        return dad[x] = Find(dad[x]);
-    }
-
-    int operator[](int x) { return Find(x); }
-
-    bool Merge(int a, int b) {
-        a = Find(a);
-        b = Find(b);
-        if (a == b)
-            return false;
-        if (a > b)
-            std::swap(a, b);
-        dad[a] += dad[b];
-        dad[a] = b;
-        --count;
-        return true;
-    }
-
-    bool IsSame(int a, int b) { return Find(a) == Find(b); }
-
-    void Assign(int size, int value = -1) {
-        dad.assign(size, value);
-        count = size;
-    }
-
-    void ReSet() {
-        std::fill(std::begin(dad), std::end(dad), -1);
-        count = dad.size();
-    }
-
-    int Count(int x) { return -dad[Find(x)]; }
-
-    int Count() const { return count; }
-
+class DisjoinSetUnion {
 private:
-    std::vector<int> dad;
-    int count;
-};
-
-class disjoin_set_union {
-private:
-    std::vector<int> dad;
-    std::size_t set_count;
+    std::vector<int> _dad;
+    std::size_t _setCount;
 
 public:
-    explicit disjoin_set_union(std::size_t __size)
-        : dad(__size, -1), set_count(__size) {}
+    explicit DisjoinSetUnion(std::size_t __size)
+        : _dad(__size, -1), _setCount(__size) {}
 
 private:
-    bool __in_range(int __x) const { return 0 <= __x && __x < dad.size(); }
+    bool _InRange(int __x) const { return 0 <= __x && __x < _dad.size(); }
 
-    int __get_leader(int __x) {
-        if (dad[__x] <= 1) {
+    int _GetLeader(int __x) {
+        if (_dad[__x] <= 1) {
             return __x;
         }
-        return dad[__x] = __get_leader(dad[__x]);
+        return _dad[__x] = _GetLeader(_dad[__x]);
     }
 
-    int __get_count(int __x) { return -dad[__get_leader(__x)]; }
+    int _GetCount(int __x) { return -_dad[_GetLeader(__x)]; }
 
     template <typename __compare>
-    bool __merge_if(int __a, int __b, const __compare &comp) {
-        __a = __get_leader(__a);
-        __b = __get_leader(__b);
+    bool _MergeIf(int __a, int __b, const __compare &comp) {
+        __a = _GetLeader(__a);
+        __b = _GetLeader(__b);
         if (!comp(__a, __b)) {
             std::swap(__a, __b);
         }
         if (!comp(__a, __b)) {
             return false;
         }
-        dad[__a] += dad[__b];
-        dad[__b] = __a;
-        --set_count;
+        _dad[__a] += _dad[__b];
+        _dad[__b] = __a;
+        --_setCount;
+        return true;
+    }
+
+    bool _MergeTo(int __a, int __b) {
+        __a = _GetLeader(__a);
+        __b = _GetLeader(__b);
+        if (__a == __b) {
+            return false;
+        }
+        _dad[__b] += _dad[__a];
+        _dad[__a] = __b;
+        --_setCount;
         return true;
     }
 
 public:
-    int get_leader(int __x) {
-        assert(__in_range(__x));
-        return __get_leader(__x);
+    int GetLeader(int __x) {
+        assert(_InRange(__x));
+        return _GetLeader(__x);
     }
 
-    int get_count() const { return set_count; }
+    int GetCount() const { return _setCount; }
 
-    int get_count(int __x) {
-        assert(__in_range(__x));
-        return __get_count(__x);
+    int GetCount(int __x) {
+        assert(_InRange(__x));
+        return _GetCount(__x);
     }
 
     template <typename __compare>
-    bool merge_if(int __a, int __b, const __compare &__comp) {
-        assert(__in_range(__a));
-        assert(__in_range(__b));
-        return __merge_if(__a, __b, __comp);
+    bool MergeIf(int __a, int __b, const __compare &__comp) {
+        assert(_InRange(__a));
+        assert(_InRange(__b));
+        return _MergeIf(__a, __b, __comp);
     }
 
-    bool merge(int __a, int __b) {
-        assert(__in_range(__a));
-        assert(__in_range(__b));
-        return __merge_if(__a, __b, std::less<int>{});
+    bool MergeTo(int __a, int __b) {
+        assert(_InRange(__a));
+        assert(_InRange(__b));
+        return _MergeTo(__a, __b);
     }
 
-    bool is_same(int __a, int __b) {
-        assert(__in_range(__a));
-        assert(__in_range(__b));
-        return __get_leader(__a) == __get_leader(__b);
+    bool IsSame(int __a, int __b) {
+        assert(_InRange(__a));
+        assert(_InRange(__b));
+        return _GetLeader(__a) == _GetLeader(__b);
     }
 
-    void assign(std::size_t __size) {
-        dad.assign(__size, -1);
-        set_count = __size;
+    void Assign(std::size_t __size) {
+        _dad.assign(__size, -1);
+        _setCount = __size;
     }
 };
