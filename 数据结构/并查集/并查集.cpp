@@ -13,7 +13,7 @@ private:
     bool _InRange(int __x) const { return 0 <= __x && __x < _dad.size(); }
 
     int _GetLeader(int __x) {
-        if (_dad[__x] <= 1) {
+        if (_dad[__x] <= -1) {
             return __x;
         }
         return _dad[__x] = _GetLeader(_dad[__x]);
