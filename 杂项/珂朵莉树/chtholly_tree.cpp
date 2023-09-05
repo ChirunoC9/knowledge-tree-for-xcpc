@@ -1,38 +1,39 @@
 #include "bits/stdc++.h"
 
-template <typename __type> class chtholly_tree {
+template <typename __type> class ChthollyTree {
 private:
-    std::map<int, __type> mp;
+    std::map<int, __type> _mp;
 
 public:
-    using type = __type;
+    using ValueType = __type;
 
 public:
-    explicit chtholly_tree(int _first, const __type &__init_value)
-        : mp{{_first - 1, __init_value}} {}
+    explicit ChthollyTree(int __first, const __type &__init_value)
+        : _mp{{__first - 1, __init_value}} {}
 
-    void reset(int _first, const __type &__init_value) {
-        mp.clear();
-        mp[_first - 1] = __init_value;
+    void Reset(int __first, const __type &__init_value) {
+        _mp.clear();
+        _mp[__first - 1] = __init_value;
     }
 
-    void split(int pos) {
-        auto it = std::prev(mp.upper_bound(pos));
-        mp[pos] = it->second;
+    void Split(int __pos) {
+        auto targetIter = std::prev(_mp.upper_bound(__pos));
+        _mp[__pos] = targetIter->second;
     }
 
-    void split(int pl, int pr) {
-        split(pl);
-        split(pr);
+    // [l, r]
+    void Split(int __pos_l, int __pos_r) {
+        Split(__pos_l);
+        Split(__pos_r);
     }
 
-    auto get_pos_iter(int pos) { return mp.find(pos); }
+    auto GetPosIter(int __pos) { return _mp.find(__pos); }
 
-    void assign(int l, int r, const __type &value) {
-        split(l, r);
-        auto it = get_pos_iter(l);
-        while (it->first != r)
-            it = mp.erase(it);
-        mp[l] = value;
+    void Assign(int __l, int __r, const __type &__value) {
+        Split(__l, __r);
+        auto it = GetPosIter(__l);
+        while (it->first != __r)
+            it = _mp.erase(it);
+        _mp[__l] = __value;
     }
 };
