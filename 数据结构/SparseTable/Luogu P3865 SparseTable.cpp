@@ -15,6 +15,7 @@ int main() {
         std::cin >> a[i];
     }
 
+    // std::bit_width(n) == std::__lg(n) + 1
     std::vector f(std::bit_width<uint>(n), std::vector<int>(n));
     for (int i = 0; i < n; i++) {
         f[0][i] = a[i];
