@@ -10,18 +10,17 @@ int main() {
     int n, q;
     std::cin >> n >> q;
 
-    std::vector<int> a(n + 1);
-    for (int i = 1; i <= n; i++) {
+    std::vector<int> a(n);
+    for (int i = 0; i < n; i++) {
         std::cin >> a[i];
     }
 
-    // std::bit_width(n) == std::__lg(n) + 1
-    std::vector f(std::bit_width<uint>(n), std::vector<int>(n + 1));
-    for (int i = 1; i <= n; i++) {
+    std::vector f(std::bit_width<uint>(n), std::vector<int>(n));
+    for (int i = 0; i < n; i++) {
         f[0][i] = a[i];
     }
     for (int i = 1; i < std::bit_width<uint>(n); i++) {
-        for (int j = 1; j + (1 << i) - 1 <= n; j++) {
+        for (int j = 0; j + (1 << i) - 1 < n; j++) {
             f[i][j] = std::max(f[i - 1][j], f[i - 1][j + (1 << (i - 1))]);
         }
     }
@@ -34,6 +33,8 @@ int main() {
     for (int i = 0; i < q; i++) {
         int l, r;
         std::cin >> l >> r;
+        l--;
+        r--;
         std::cout << Ask(l, r) << '\n';
     }
 }
