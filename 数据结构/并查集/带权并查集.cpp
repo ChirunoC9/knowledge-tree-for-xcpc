@@ -1,15 +1,35 @@
+#include <cassert>
+#include <iostream>
 #include <numeric>
 #include <vector>
 
-template <typename Vector> class WeidgeDisjoinSetUnion {
+using i64 = int64_t;
+
+template <typename Vector>
+#ifdef __cpp_concepts
+    requires requires(Vector a, Vector b) {
+        { a + b } -> std::same_as<Vector>;
+        { -a } -> std::same_as<Vector>;
+        { a += b };
+    }
+#endif
+class WeidgeDisjointSet {
 private:
     std::vector<int> _leader;
     std::vector<Vector> _vector;
 
 public:
-    explicit WeidgeDisjoinSetUnion(std::size_t size, Vector vec)
+    using vector_type = Vector;
+
+private:
+    static void _IotaInitLeader(std::vector<int> &leader) {
+        std::iota(leader.begin(), leader.end(), 0);
+    }
+
+public:
+    explicit WeidgeDisjointSet(std::size_t size, Vector vec)
         : _leader(size), _vector(size, vec) {
-        std::iota(_leader.begin(), _leader.end(), 0);
+        _IotaInitLeader(_leader);
     }
 
     int GetLeader(int x) {
@@ -32,16 +52,55 @@ public:
         return true;
     }
 
-    bool IsSame(int a, int b) { return GetLeader(a) == GetLeader(b); }
+    bool IsSame(int a, int b) noexcept { return GetLeader(a) == GetLeader(b); }
 
-    Vector Ask(int a, int b) const {
-        assert(IsSame(a, b));
-        return _vector[a] + -_vector[b];
-    }
+    Vector Ask(int a, int b) const { return _vector[a] + -_vector[b]; }
 
     void Assign(std::size_t size, Vector vec) {
         _leader.resize(size);
-        std::iota(_leader.begin(), _leader.end(), 0);
+        _IotaInitLeader(_leader);
         _vector.assign(size, vec);
     }
 };
+
+struct Vector {
+    i64 val;
+
+    constexpr Vector(i64 v = 0) : val(v) {}
+
+    friend constexpr Vector operator+(const Vector &a, const Vector &b) {
+        return Vector{a.val + b.val};
+    }
+
+    constexpr Vector &operator+=(const Vector &o) {
+        *this = *this + o;
+        return *this;
+    }
+
+    constexpr Vector operator-() const { return Vector{-val}; }
+};
+
+int main() {
+    std::cin.tie(nullptr)->sync_with_stdio(false);
+
+    int n, q;
+    std::cin >> n >> q;
+    WeidgeDisjointSet<Vector> dsu(n, 0);
+
+    for (int t = 0; t < q; t++) {
+        int opt, u, v;
+        std::cin >> opt >> u >> v;
+        if (opt == 0) {
+            i64 w;
+            std::cin >> w;
+            dsu.MergeTo(u, v, w);
+        } else {
+            if (!dsu.IsSame(u, v)) {
+                std::cout << "?\n";
+            } else {
+                auto ret = dsu.Ask(u, v);
+                std::cout << ret.val << '\n';
+            }
+        }
+    }
+}

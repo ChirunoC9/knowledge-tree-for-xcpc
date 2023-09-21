@@ -1,88 +1,91 @@
-#include <bits/stdc++.h>
+#include <cassert>
+#include <concepts>
+#include <numeric>
+#include <vector>
 
-class DisjoinSetUnion {
+class DisjointSet {
 private:
     std::vector<int> _leader;
     std::size_t _setCount;
 
 public:
-    explicit DisjoinSetUnion(std::size_t __size)
-        : _leader(__size, -1), _setCount(__size) {}
+    explicit DisjointSet(std::size_t size)
+        : _leader(size, -1), _setCount(size) {}
 
 private:
-    bool _InRange(int __x) const { return 0 <= __x && __x < _leader.size(); }
+    bool _InRange(int x) const noexcept { return 0 <= x && x < _leader.size(); }
 
-    int _GetLeader(int __x) {
-        if (_leader[__x] <= -1) {
-            return __x;
+    int _GetLeader(int x) {
+        if (_leader[x] <= -1) {
+            return x;
         }
-        return _leader[__x] = _GetLeader(_leader[__x]);
+        return _leader[x] = _GetLeader(_leader[x]);
     }
 
-    int _GetCount(int __x) { return -_leader[_GetLeader(__x)]; }
+    int _GetCount(int x) { return -_leader[_GetLeader(x)]; }
 
-    template <typename __compare>
-    bool _MergeIf(int __a, int __b, const __compare &comp) {
-        __a = _GetLeader(__a);
-        __b = _GetLeader(__b);
-        if (!comp(__a, __b)) {
-            std::swap(__a, __b);
+    template <std::strict_weak_order<int, int> Compare>
+    bool _MergeIf(int a, int b, const Compare &comp) {
+        a = _GetLeader(a);
+        b = _GetLeader(b);
+        if (!comp(a, b)) {
+            std::swap(a, b);
         }
-        if (!comp(__a, __b)) {
+        if (!comp(a, b)) {
             return false;
         }
-        _leader[__a] += _leader[__b];
-        _leader[__b] = __a;
+        _leader[a] += _leader[b];
+        _leader[b] = a;
         --_setCount;
         return true;
     }
 
-    bool _MergeTo(int __a, int __b) {
-        __a = _GetLeader(__a);
-        __b = _GetLeader(__b);
-        if (__a == __b) {
+    bool _MergeTo(int a, int b) noexcept {
+        a = _GetLeader(a);
+        b = _GetLeader(b);
+        if (a == b) {
             return false;
         }
-        _leader[__b] += _leader[__a];
-        _leader[__a] = __b;
+        _leader[b] += _leader[a];
+        _leader[a] = b;
         --_setCount;
         return true;
     }
 
 public:
-    int GetLeader(int __x) {
-        assert(_InRange(__x));
-        return _GetLeader(__x);
+    int GetLeader(int x) {
+        assert(_InRange(x));
+        return _GetLeader(x);
     }
 
-    int GetCount() const { return _setCount; }
+    int GetCount() const noexcept { return _setCount; }
 
-    int GetCount(int __x) {
-        assert(_InRange(__x));
-        return _GetCount(__x);
+    int GetCount(int x) {
+        assert(_InRange(x));
+        return _GetCount(x);
     }
 
-    template <typename __compare>
-    bool MergeIf(int __a, int __b, const __compare &__comp) {
-        assert(_InRange(__a));
-        assert(_InRange(__b));
-        return _MergeIf(__a, __b, __comp);
+    template <std::strict_weak_order<int, int> Compare>
+    bool MergeIf(int a, int b, const Compare &comp) {
+        assert(_InRange(a));
+        assert(_InRange(b));
+        return _MergeIf(a, b, comp);
     }
 
-    bool MergeTo(int __a, int __b) {
-        assert(_InRange(__a));
-        assert(_InRange(__b));
-        return _MergeTo(__a, __b);
+    bool MergeTo(int a, int b) {
+        assert(_InRange(a));
+        assert(_InRange(b));
+        return _MergeTo(a, b);
     }
 
-    bool IsSame(int __a, int __b) {
-        assert(_InRange(__a));
-        assert(_InRange(__b));
-        return _GetLeader(__a) == _GetLeader(__b);
+    bool IsSame(int a, int b) {
+        assert(_InRange(a));
+        assert(_InRange(b));
+        return _GetLeader(a) == _GetLeader(b);
     }
 
-    void Assign(std::size_t __size) {
-        _leader.assign(__size, -1);
-        _setCount = __size;
+    void Assign(std::size_t size) {
+        _leader.assign(size, -1);
+        _setCount = size;
     }
 };
