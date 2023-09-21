@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 
-template <typename _Tp, typename _Oper> class SparseTable {
+template <typename _Tp, typename _Oper>
+class SparseTable {
 private:
     std::vector<std::vector<_Tp>> _f;
     _Oper _oper;
@@ -36,19 +37,21 @@ public:
         }
     }
 
-    _Tp Ask(std::size_t l, std::size_t r) const {
+    auto Ask(std::size_t l, std::size_t r) const -> _Tp {
         auto s = std::bit_width(r - l) - 1;
         return _oper(_f[s][l], _f[s][r - (1 << s)]);
     }
 
-    std::size_t Size() const { return _n; }
+    auto Size() const -> std::size_t {
+        return _n;
+    }
 };
 
 template <typename Iter, typename Oper>
 explicit SparseTable(Iter, Iter, Oper)
     -> SparseTable<typename std::iterator_traits<Iter>::value_type, Oper>;
 
-int main() {
+auto main() -> int {
     std::cin.tie(nullptr)->sync_with_stdio(false);
 
     int n, q;
@@ -59,8 +62,8 @@ int main() {
         std::cin >> item;
     }
 
-    SparseTable st(a.begin(), a.end(),
-                   [](int a, int b) { return std::max(a, b); });
+    SparseTable st(
+        a.begin(), a.end(), [](int a, int b) { return std::max(a, b); });
 
     for (int i = 0; i < q; i++) {
         int l, r;
