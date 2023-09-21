@@ -2,10 +2,11 @@
 
 struct InfoImpl {};
 
-template <typename __Info, typename __Opt> class SegmentTree {
+template <typename _Info, typename _Opt>
+class SegmentTree {
 public:
-    using value_type = __Info;
-    using opt_type = __Opt;
+    using value_type = _Info;
+    using opt_type = _Opt;
 
 private:
     std::vector<value_type> _node;
@@ -16,15 +17,15 @@ private:
     static constexpr std::size_t _root = 0;
 
 private:
-    static constexpr std::size_t _GetLeftId(std::size_t id) noexcept {
+    static constexpr auto _GetLeftId(std::size_t id) noexcept -> std::size_t {
         return id * 2 + 1;
     }
-    static constexpr std::size_t _GetRightId(std::size_t id) noexcept {
+    static constexpr auto _GetRightId(std::size_t id) noexcept -> std::size_t {
         return id * 2 + 2;
     }
 
 public:
-    explicit SegmentTree(std::size_t n, __Info value, __Opt opt)
+    explicit SegmentTree(std::size_t n, _Info value, _Opt opt)
         : _node(n * 4, value), _opt(std::move(opt)), _n(n) {}
 
     template <typename Iter, typename Opt>
@@ -37,8 +38,8 @@ public:
 
 private:
     template <typename Iter>
-    void _Build(std::size_t l, std::size_t r, std::size_t id, Iter first,
-                Iter last) {
+    auto _Build(std::size_t l, std::size_t r, std::size_t id, Iter first,
+                Iter last) -> void {
         if (r - l == 1) {
             _node[id] = *first;
         } else {
@@ -50,13 +51,14 @@ private:
     }
 
 public:
-    template <typename Iter> void Build(Iter first, Iter last) {
+    template <typename Iter>
+    auto Build(Iter first, Iter last) -> void {
         _Build(0, _n, _root, first, last);
     }
 
 private:
-    __Info _RangeQuery(std::size_t l, std::size_t r, std::size_t id,
-                       std::size_t ql, std::size_t qr) {
+    auto _RangeQuery(std::size_t l, std::size_t r, std::size_t id,
+                     std::size_t ql, std::size_t qr) -> _Info {
         if (r - l == 1) {
             return _node[id];
         } else {
@@ -73,14 +75,14 @@ private:
     }
 
 public:
-    __Info RangeQuery(std::size_t ql, std::size_t qr) {
+    auto RangeQuery(std::size_t ql, std::size_t qr) -> _Info {
         return _RangeQuery(0, _n, _root, ql, qr);
     }
 
 private:
     template <typename T, typename ActionOpt>
-    void _Action(std::size_t l, std::size_t r, std::size_t id,
-                 std::size_t target, T value, ActionOpt &&action) {
+    auto _Action(std::size_t l, std::size_t r, std::size_t id,
+                 std::size_t target, T value, ActionOpt &&action) -> void {
         if (r - l == 1) {
             _node[id] = action(_node[id], value);
         } else {
@@ -96,7 +98,7 @@ private:
 
 public:
     template <typename T, typename ActionOpt>
-    void Action(std::size_t target, T value, ActionOpt &&action) {
+    auto Action(std::size_t target, T value, ActionOpt &&action) -> void {
         _Action(0, _n, _root, target, value, action);
     }
 };
