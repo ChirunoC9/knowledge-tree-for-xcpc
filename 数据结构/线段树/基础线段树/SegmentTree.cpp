@@ -101,6 +101,6 @@ public:
     }
 };
 
-template <typename Container, typename Opt>
-explicit SegmentTree(const Container &, Opt)
-    -> SegmentTree<typename Container::value_type, Opt>;
+template <typename Iter, typename Opt>
+explicit SegmentTree(Iter, Iter, Opt)
+    -> SegmentTree<typename std::iterator_traits<Iter>::value_type, Opt>;
