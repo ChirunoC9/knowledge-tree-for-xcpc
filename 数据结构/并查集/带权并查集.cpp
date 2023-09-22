@@ -20,6 +20,7 @@ private:
 
 public:
     using vector_type = Vector;
+    using value_type = Vector;
 
 private:
     static void _IotaInitLeader(std::vector<int> &leader) {
@@ -42,19 +43,23 @@ public:
         return _leader[x];
     }
 
-    bool MergeTo(int a, int b, Vector vec) {
-        int ra = GetLeader(a), rb = GetLeader(b);
+    bool MergeTo(int from, int to, Vector vec) {
+        int ra = GetLeader(from), rb = GetLeader(to);
         if (ra == rb) {
             return false;
         }
-        _vector[ra] = -_vector[a] + vec + _vector[b];
+        _vector[ra] = -_vector[from] + vec + _vector[to];
         _leader[ra] = rb;
         return true;
     }
 
-    bool IsSame(int a, int b) noexcept { return GetLeader(a) == GetLeader(b); }
+    bool IsSame(int a, int b) noexcept {
+        return GetLeader(a) == GetLeader(b);
+    }
 
-    Vector Ask(int a, int b) const { return _vector[a] + -_vector[b]; }
+    Vector Ask(int from, int to) const {
+        return _vector[from] + -_vector[to];
+    }
 
     void Assign(std::size_t size, Vector vec) {
         _leader.resize(size);
@@ -77,7 +82,9 @@ struct Vector {
         return *this;
     }
 
-    constexpr Vector operator-() const { return Vector{-val}; }
+    constexpr Vector operator-() const {
+        return Vector{-val};
+    }
 };
 
 int main() {
