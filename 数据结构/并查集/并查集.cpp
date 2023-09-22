@@ -13,19 +13,23 @@ public:
         : _leader(size, -1), _setCount(size) {}
 
 private:
-    bool _InRange(int x) const noexcept { return 0 <= x && x < _leader.size(); }
+    auto _InRange(int x) const noexcept -> bool {
+        return 0 <= x && x < _leader.size();
+    }
 
-    int _GetLeader(int x) {
+    auto _GetLeader(int x) -> int {
         if (_leader[x] <= -1) {
             return x;
         }
         return _leader[x] = _GetLeader(_leader[x]);
     }
 
-    int _GetCount(int x) { return -_leader[_GetLeader(x)]; }
+    auto _GetCount(int x) -> int {
+        return -_leader[_GetLeader(x)];
+    }
 
     template <std::strict_weak_order<int, int> Compare>
-    bool _MergeIf(int a, int b, const Compare &comp) {
+    auto _MergeIf(int a, int b, const Compare &comp) -> bool {
         a = _GetLeader(a);
         b = _GetLeader(b);
         if (!comp(a, b)) {
@@ -40,7 +44,7 @@ private:
         return true;
     }
 
-    bool _MergeTo(int a, int b) noexcept {
+    auto _MergeTo(int a, int b) noexcept -> bool {
         a = _GetLeader(a);
         b = _GetLeader(b);
         if (a == b) {
@@ -53,38 +57,49 @@ private:
     }
 
 public:
-    int GetLeader(int x) {
+    auto GetLeader(int x) -> int {
         assert(_InRange(x));
         return _GetLeader(x);
     }
 
-    int GetCount() const noexcept { return _setCount; }
+    auto GetCount() const noexcept -> std::size_t {
+        return _setCount;
+    }
 
-    int GetCount(int x) {
+    auto GetCount(int x) -> int {
         assert(_InRange(x));
         return _GetCount(x);
     }
 
-    template <std::strict_weak_order<int, int> Compare>
-    bool MergeIf(int a, int b, const Compare &comp) {
+    template <std::strict_weak_order<int, int> _Compare>
+    auto MergeIf(int a, int b, const _Compare &comp) -> bool {
         assert(_InRange(a));
         assert(_InRange(b));
         return _MergeIf(a, b, comp);
     }
 
-    bool MergeTo(int a, int b) {
+    auto MergeTo(int a, int b) -> bool {
         assert(_InRange(a));
         assert(_InRange(b));
         return _MergeTo(a, b);
     }
 
-    bool IsSame(int a, int b) {
+    auto IsSame(int a, int b) -> bool {
         assert(_InRange(a));
         assert(_InRange(b));
         return _GetLeader(a) == _GetLeader(b);
     }
 
-    void Assign(std::size_t size) {
+    auto IsSame(std::initializer_list<int> list) -> bool {
+        bool ret = true;
+        int v = *list.begin();
+        for (auto x : list) {
+            ret = IsSame(v, x);
+        }
+        return ret;
+    }
+
+    auto Assign(std::size_t size) -> void {
         _leader.assign(size, -1);
         _setCount = size;
     }
