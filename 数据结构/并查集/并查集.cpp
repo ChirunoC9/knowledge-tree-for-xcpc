@@ -28,8 +28,8 @@ private:
         return -_leader[_GetLeader(x)];
     }
 
-    template <std::strict_weak_order<int, int> Compare>
-    auto _MergeIf(int a, int b, const Compare &comp) -> bool {
+    template <std::strict_weak_order<int, int> _Compare>
+    auto _MergeIf(int a, int b, const _Compare &comp) -> bool {
         a = _GetLeader(a);
         b = _GetLeader(b);
         if (!comp(a, b)) {
