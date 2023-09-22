@@ -14,7 +14,7 @@ public:
 
 private:
     auto _InRange(int x) const noexcept -> bool {
-        return 0 <= x && x < _leader.size();
+        return 0 <= x && x < (int)_leader.size();
     }
 
     auto _GetLeader(int x) -> int {
@@ -95,6 +95,21 @@ public:
         int v = *list.begin();
         for (auto x : list) {
             ret = IsSame(v, x);
+            if (!ret)
+                break;
+        }
+        return ret;
+    }
+
+    template <typename _Iter>
+        requires std::input_iterator<_Iter> &&
+                 std::same_as<typename std::iterator_traits<_Iter>::value_type,
+                              int>
+    auto IsSame(_Iter first, _Iter last) {
+        bool ret = true;
+        int v = *first;
+        for (auto it = first + 1; it != last && ret; ++it) {
+            ret = IsSame(v, *it);
         }
         return ret;
     }
