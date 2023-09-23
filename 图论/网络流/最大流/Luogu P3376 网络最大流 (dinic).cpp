@@ -10,9 +10,8 @@ struct Edge {
     int to;
     i64 cap;
     int next;
-    Edge(int to = {}, i64 cap = {}, int next = -1) : to(to), cap(cap), next(next) {
-
-    }
+    Edge(int to = {}, i64 cap = {}, int next = -1)
+        : to(to), cap(cap), next(next) {}
 };
 std::vector<Edge> edge;
 std::vector<int> head, cur, lv;
@@ -25,8 +24,10 @@ void init(int n, int siz) {
 }
 
 void add_edge(int from, int to, i64 cap) {
-    edge.emplace_back(to, cap, head[from]); head[from] = int(edge.size()) - 1;
-    edge.emplace_back(from, 0, head[to]); head[to] = int(edge.size()) - 1;
+    edge.emplace_back(to, cap, head[from]);
+    head[from] = int(edge.size()) - 1;
+    edge.emplace_back(from, 0, head[to]);
+    head[to] = int(edge.size()) - 1;
 }
 
 bool bfs(int s, int t) {
@@ -76,18 +77,20 @@ i64 max_flow(int s, int t) {
 
 int main() {
     std::cin.tie(nullptr)->sync_with_stdio(false);
-    
+
     int n, m, s, t;
     std::cin >> n >> m >> s >> t;
-    
+
     init(n, m * 2);
 
-    s --; t --;
-    for (int i = 0; i < m; i ++) {
+    s--;
+    t--;
+    for (int i = 0; i < m; i++) {
         int from, to;
         i64 cap;
         std::cin >> from >> to >> cap;
-        from --; to --;
+        from--;
+        to--;
         add_edge(from, to, cap);
     }
 
