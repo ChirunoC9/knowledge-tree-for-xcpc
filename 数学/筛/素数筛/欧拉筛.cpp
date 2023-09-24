@@ -8,11 +8,11 @@ std::vector<int> prime;
 
 void init() {
     no_prime[0] = no_prime[1] = 1;
-    for (int i = 2; i < no_prime.size(); i ++) {
+    for (int i = 2; i < no_prime.size(); i++) {
         if (!no_prime[i])
             prime.emplace_back(i);
         for (i64 j : prime) {
-            if (i * j >= no_prime.size()) 
+            if (i * j >= no_prime.size())
                 break;
             no_prime[i * j] = 1;
             if (i % j == 0)
@@ -27,11 +27,11 @@ std::pair<std::bitset<N>, std::vector<int>> GetPrimeList() {
     std::bitset<N> no_prime{};
     std::vector<int> prime;
     no_prime[0] = no_prime[1] = 1;
-    for (int i = 2; i < no_prime.size(); i ++) {
+    for (int i = 2; i < no_prime.size(); i++) {
         if (!no_prime[i])
             prime.emplace_back(i);
         for (i64 j : prime) {
-            if (i * j >= no_prime.size()) 
+            if (i * j >= no_prime.size())
                 break;
             no_prime[i * j] = 1;
             if (i % j == 0)
