@@ -8,12 +8,13 @@ int main() {
 
     int n, m;
     std::cin >> n >> m;
-    
-    std::vector adj(n, std::vector<std::pair<int,int>>{});
-    for (int i = 0; i < m; i ++) {
+
+    std::vector adj(n, std::vector<std::pair<int, int>>{});
+    for (int i = 0; i < m; i++) {
         int u, v, w;
         std::cin >> u >> v >> w;
-        u --; v --;
+        u--;
+        v--;
         adj[u].emplace_back(v, w);
     }
 
@@ -21,7 +22,7 @@ int main() {
     std::vector<bool> inque(n);
     std::vector<int> cnt(n);
     std::queue<int> q;
-    for (int i = 0; i < n; i ++) {
+    for (int i = 0; i < n; i++) {
         dis[i] = 0;
         inque[i] = true;
         q.emplace(i);
