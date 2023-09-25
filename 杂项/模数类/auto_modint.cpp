@@ -117,8 +117,11 @@ namespace Leazozi::Type {
             if constexpr (std::is_same_v<value_type, i32> || std::is_same_v<value_type, int> ||
                           std::is_same_v<value_type, u32>) {
                 _value = (value_type)(((u64)_value * other._value) % P);
-            } else {
+            } else if (std::is_same_v<value_type, i64> || std::is_same_v<value_type, u64> ||
+                       std::is_same_v<value_type, long long>) {
                 _value = (value_type)((u128)_value * other._value) % P;
+            } else {
+                _value = _SlowMut(_value, other._value);
             }
             return *this;
         }
@@ -212,6 +215,19 @@ namespace Leazozi::Type {
                     result *= a;
                 }
                 a *= a;
+                i >>= 1;
+            }
+            return result;
+        }
+
+        inline static constexpr auto _SlowMut(value_type a, std::integral auto i) noexcept -> value_type {
+            value_type result = 1 % P;
+            a %= P;
+            while (i > 0) {
+                if (i & 1) {
+                    (result += a) %= P;
+                }
+                (a += a) %= P;
                 i >>= 1;
             }
             return result;
