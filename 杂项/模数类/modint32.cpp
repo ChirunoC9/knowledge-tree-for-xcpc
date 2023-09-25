@@ -1,6 +1,7 @@
 #include "bits/stdc++.h"
 
-template <int _P> struct ModInt32 {
+template <int _P>
+struct ModInt32 {
 private:
     using i32 = int32_t;
     using i64 = int64_t;
@@ -21,11 +22,17 @@ public:
             _value += P;
     }
 
-    constexpr explicit operator int() const noexcept { return _value; }
+    constexpr explicit operator int() const noexcept {
+        return _value;
+    }
 
-    constexpr explicit operator long long() const noexcept { return _value; }
+    constexpr explicit operator long long() const noexcept {
+        return _value;
+    }
 
-    constexpr explicit operator bool() const noexcept { return _value > 0; }
+    constexpr explicit operator bool() const noexcept {
+        return _value > 0;
+    }
 
     constexpr bool operator==(const ModInt32 &other) const noexcept {
         return _value == other._value;
@@ -39,7 +46,9 @@ public:
         return ModInt32(_value ? P - _value : 0);
     }
 
-    constexpr ModInt32 operator+() const noexcept { return *this; }
+    constexpr ModInt32 operator+() const noexcept {
+        return *this;
+    }
 
     constexpr ModInt32 &operator++() noexcept {
         ++_value;
