@@ -28,7 +28,7 @@ BinPackArguments: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 
 # 行上限
-ColumnLimit: 120
+ColumnLimit: 80
 
 # 指针和引用的对齐: Left, Right, Middle
 PointerAlignment: Right

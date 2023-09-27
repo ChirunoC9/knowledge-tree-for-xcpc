@@ -3,32 +3,35 @@
 #include <iostream>
 #include <vector>
 
-template <typename _Tp, typename _Oper>
+template <typename _Ty, typename _Oper>
 class SparseTable {
 private:
-    std::vector<std::vector<_Tp>> _f;
+    std::vector<std::vector<_Ty>> _f;
     _Oper _oper;
     std::size_t _n;
 
-    explicit SparseTable(std::size_t n, _Tp value, _Oper oper)
-        : _f(std::bit_width(n), std::vector<_Tp>(n, value)),
+public:
+    using value_type = _Ty;
+    using operator_type = _Oper;
+
+private:
+    explicit SparseTable(std::size_t n, _Ty value, _Oper oper)
+        : _f(std::bit_width(n), std::vector<_Ty>(n, value)),
           _oper(std::move(oper)), _n(n) {}
 
 public:
-    template <std::input_iterator Iter, typename Oper>
-        requires requires(typename std::iterator_traits<Iter>::value_type x,
-                          Oper oper) {
+    template <std::input_iterator __Iter, typename __Oper>
+        requires requires(typename std::iterator_traits<__Iter>::value_type x,
+                          __Oper oper) {
             {
                 oper(x, x)
-            } -> std::same_as<typename std::iterator_traits<Iter>::value_type>;
+            }
+            -> std::same_as<typename std::iterator_traits<__Iter>::value_type>;
         }
-    explicit SparseTable(Iter first, Iter last, Oper oper)
-        : SparseTable(std::distance(first, last), (typename Iter::value_type){},
-                      std::move(oper)) {
-        for (auto target = first, it = _f[0].begin(); target != last;
-             ++target, ++it) {
-            *it = *target;
-        }
+    explicit SparseTable(__Iter first, __Iter last, __Oper oper)
+        : SparseTable(std::distance(first, last),
+                      (typename __Iter::value_type){}, std::move(oper)) {
+        std::copy(first, last, _f[0].begin());
 
         for (std::size_t i = 1; i < _f.size(); i++) {
             for (std::size_t j = 0; j + (1 << i) - 1 < _n; j++) {
@@ -37,19 +40,19 @@ public:
         }
     }
 
-    auto Ask(std::size_t l, std::size_t r) const -> _Tp {
+    auto Ask(std::size_t l, std::size_t r) const -> _Ty {
         auto s = std::bit_width(r - l) - 1;
         return _oper(_f[s][l], _f[s][r - (1 << s)]);
     }
 
-    auto Size() const -> std::size_t {
+    auto Size() const noexcept -> std::size_t {
         return _n;
     }
 };
 
-template <typename Iter, typename Oper>
-explicit SparseTable(Iter, Iter, Oper)
-    -> SparseTable<typename std::iterator_traits<Iter>::value_type, Oper>;
+template <typename __Iter, typename __Oper>
+explicit SparseTable(__Iter, __Iter, __Oper)
+    -> SparseTable<typename std::iterator_traits<__Iter>::value_type, __Oper>;
 
 auto main() -> int {
     std::cin.tie(nullptr)->sync_with_stdio(false);
