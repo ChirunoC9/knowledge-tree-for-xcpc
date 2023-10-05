@@ -62,6 +62,10 @@ public:
         return _GetLeader(x);
     }
 
+    auto IsLeader(int x) const -> bool {
+        return _leader[x] <= -1;
+    }
+
     auto GetCount() const noexcept -> std::size_t {
         return _setCount;
     }
