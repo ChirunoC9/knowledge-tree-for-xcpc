@@ -113,11 +113,13 @@ public:
     }
 
     constexpr auto operator*=(const ModInt &other) noexcept -> ModInt & {
-        if constexpr (std::is_same_v<value_type, i32> || std::is_same_v<value_type, int> ||
+        if constexpr (std::is_same_v<value_type, i32> ||
+                      std::is_same_v<value_type, int> ||
                       std::is_same_v<value_type, u32>) {
             _value = (value_type)(((u64)_value * other._value) % P);
-        } else if (std::is_same_v<value_type, i64> || std::is_same_v<value_type, u64> ||
-                   std::is_same_v<value_type, long long>) {
+        } else if constexpr (std::is_same_v<value_type, i64> ||
+                             std::is_same_v<value_type, u64> ||
+                             std::is_same_v<value_type, long long>) {
             _value = (value_type)((u128)_value * other._value) % P;
         } else {
             _value = _SlowMut(_value, other._value);
@@ -158,35 +160,47 @@ public:
         return _value;
     }
 
-    friend constexpr auto operator+(const ModInt &a, const std::integral auto &b) noexcept -> ModInt {
+    friend constexpr auto operator+(const ModInt &a,
+                                    const std::integral auto &b) noexcept
+        -> ModInt {
         return a + ModInt(b);
     }
 
-    friend constexpr auto operator+(const std::integral auto &a, const ModInt &b) noexcept -> ModInt {
+    friend constexpr auto operator+(const std::integral auto &a,
+                                    const ModInt &b) noexcept -> ModInt {
         return ModInt(a) + b;
     }
 
-    friend constexpr auto operator-(const ModInt &a, const std::integral auto &b) noexcept -> ModInt {
+    friend constexpr auto operator-(const ModInt &a,
+                                    const std::integral auto &b) noexcept
+        -> ModInt {
         return a - ModInt(b);
     }
 
-    friend constexpr auto operator-(const std::integral auto &a, const ModInt &b) noexcept -> ModInt {
+    friend constexpr auto operator-(const std::integral auto &a,
+                                    const ModInt &b) noexcept -> ModInt {
         return ModInt(a) - b;
     }
 
-    friend constexpr auto operator*(const ModInt &a, const std::integral auto &b) noexcept -> ModInt {
+    friend constexpr auto operator*(const ModInt &a,
+                                    const std::integral auto &b) noexcept
+        -> ModInt {
         return a * ModInt(b);
     }
 
-    friend constexpr auto operator*(const std::integral auto &a, const ModInt b) noexcept -> ModInt {
+    friend constexpr auto operator*(const std::integral auto &a,
+                                    const ModInt b) noexcept -> ModInt {
         return ModInt(a) * b;
     }
 
-    friend constexpr auto operator/(const ModInt &a, const std::integral auto &b) noexcept -> ModInt {
+    friend constexpr auto operator/(const ModInt &a,
+                                    const std::integral auto &b) noexcept
+        -> ModInt {
         return a * ModInt(b).GetInv();
     }
 
-    friend constexpr auto operator/(const std::integral auto &a, const ModInt &b) noexcept -> ModInt {
+    friend constexpr auto operator/(const std::integral auto &a,
+                                    const ModInt &b) noexcept -> ModInt {
         return ModInt(a) * b.GetInv();
     }
 
@@ -201,13 +215,15 @@ public:
         return in;
     }
 
-    friend auto operator<<(std::ostream &out, const ModInt &x) -> std::ostream & {
+    friend auto operator<<(std::ostream &out, const ModInt &x)
+        -> std::ostream & {
         out << x._value;
         return out;
     }
 
 private:
-    inline static constexpr auto _Pow(ModInt a, std::integral auto i) noexcept -> ModInt {
+    inline static constexpr auto _Pow(ModInt a, std::integral auto i) noexcept
+        -> ModInt {
         ModInt result = 1;
         while (i > 0) {
             if (i & 1) {
@@ -219,7 +235,9 @@ private:
         return result;
     }
 
-    inline static constexpr auto _SlowMut(value_type a, std::integral auto i) noexcept -> value_type {
+    inline static constexpr auto _SlowMut(value_type a,
+                                          std::integral auto i) noexcept
+        -> value_type {
         value_type result = 1 % P;
         a %= P;
         while (i > 0) {
