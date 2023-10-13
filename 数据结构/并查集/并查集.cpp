@@ -24,12 +24,12 @@ private:
         return _leader[x] = _GetLeader(_leader[x]);
     }
 
-    auto _GetCount(int x) -> int {
+    auto _Count(int x) -> int {
         return -_leader[_GetLeader(x)];
     }
 
-    template <std::strict_weak_order<int, int> _Compare>
-    auto _MergeIf(int a, int b, const _Compare &comp) -> bool {
+    template <std::strict_weak_order<int, int> _BinaryCompare>
+    auto _MergeIf(int a, int b, const _BinaryCompare &comp) -> bool {
         a = _GetLeader(a);
         b = _GetLeader(b);
         if (!comp(a, b)) {
@@ -44,14 +44,14 @@ private:
         return true;
     }
 
-    auto _MergeTo(int a, int b) noexcept -> bool {
-        a = _GetLeader(a);
-        b = _GetLeader(b);
-        if (a == b) {
+    auto _MergeTo(int from, int to) noexcept -> bool {
+        from = _GetLeader(from);
+        to = _GetLeader(to);
+        if (from == to) {
             return false;
         }
-        _leader[b] += _leader[a];
-        _leader[a] = b;
+        _leader[to] += _leader[from];
+        _leader[from] = to;
         --_setCount;
         return true;
     }
@@ -62,30 +62,34 @@ public:
         return _GetLeader(x);
     }
 
-    auto IsLeader(int x) const -> bool {
-        return _leader[x] <= -1;
+    auto IsLeader(int x) -> bool {
+        return GetLeader(x) != x;
     }
 
-    auto GetCount() const noexcept -> std::size_t {
+    auto Count() const noexcept -> std::size_t {
         return _setCount;
     }
 
-    auto GetCount(int x) -> int {
+    auto Count(int x) -> int {
         assert(_InRange(x));
-        return _GetCount(x);
+        return _Count(x);
     }
 
-    template <std::strict_weak_order<int, int> _Compare>
-    auto MergeIf(int a, int b, const _Compare &comp) -> bool {
+    template <std::strict_weak_order<int, int> _BinaryCompare>
+    auto MergeIf(int a, int b, const _BinaryCompare &comp) -> bool {
         assert(_InRange(a));
         assert(_InRange(b));
         return _MergeIf(a, b, comp);
     }
 
-    auto MergeTo(int a, int b) -> bool {
-        assert(_InRange(a));
-        assert(_InRange(b));
-        return _MergeTo(a, b);
+    auto MergeTo(int from, int to) -> bool {
+        assert(_InRange(from));
+        assert(_InRange(to));
+        return _MergeTo(from, to);
+    }
+
+    auto Merge(int from, int to) -> bool {
+        return MergeTo(from, to);
     }
 
     auto IsSame(int a, int b) -> bool {
@@ -94,10 +98,12 @@ public:
         return _GetLeader(a) == _GetLeader(b);
     }
 
-    auto IsSame(std::initializer_list<int> list) -> bool {
+    auto IsSame(std::initializer_list<int> input_list) -> bool {
+        if (input_list.size() == 0)
+            return true;
         bool ret = true;
-        int v = *list.begin();
-        for (auto x : list) {
+        int v = *input_list.begin();
+        for (auto x : input_list) {
             ret = IsSame(v, x);
             if (!ret)
                 break;
@@ -105,17 +111,25 @@ public:
         return ret;
     }
 
-    template <typename _Iter>
-        requires std::input_iterator<_Iter> &&
-                 std::same_as<typename std::iterator_traits<_Iter>::value_type,
-                              int>
-    auto IsSame(_Iter first, _Iter last) {
+    template <typename _InputIterator>
+        requires std::input_iterator<_InputIterator> &&
+                 std::same_as<
+                     typename std::iterator_traits<_InputIterator>::value_type,
+                     int>
+    auto IsSame(_InputIterator first, _InputIterator last) -> bool {
+        auto _dis = std::distance(first, last);
+        if (_dis == 0)
+            return true;
         bool ret = true;
         int v = *first;
         for (auto it = first + 1; it != last && ret; ++it) {
             ret = IsSame(v, *it);
         }
         return ret;
+    }
+
+    auto Assign() -> void {
+        std::fill(_leader.begin(), _leader.end(), -1);
     }
 
     auto Assign(std::size_t size) -> void {
