@@ -5,69 +5,69 @@
 
 class DisjointSet {
 private:
-    std::vector<int> _leader;
-    std::size_t _setCount;
+    std::vector<int> _lead;
+    std::size_t _set_count;
 
 public:
     explicit DisjointSet(std::size_t size)
-        : _leader(size, -1), _setCount(size) {}
+        : _lead(size, -1), _set_count(size) {}
 
 private:
     auto _InRange(int x) const noexcept -> bool {
-        return 0 <= x && x < (int)_leader.size();
+        return 0 <= x && x < (int)_lead.size();
     }
 
-    auto _GetLeader(int x) -> int {
-        if (_leader[x] <= -1) {
+    auto _Leader(int x) -> int {
+        if (_lead[x] <= -1) {
             return x;
         }
-        return _leader[x] = _GetLeader(_leader[x]);
+        return _lead[x] = _Leader(_lead[x]);
     }
 
     auto _Count(int x) -> int {
-        return -_leader[_GetLeader(x)];
+        return -_lead[_Leader(x)];
     }
 
     template <std::strict_weak_order<int, int> _BinaryCompare>
     auto _MergeIf(int a, int b, const _BinaryCompare &comp) -> bool {
-        a = _GetLeader(a);
-        b = _GetLeader(b);
+        a = _Leader(a);
+        b = _Leader(b);
         if (!comp(a, b)) {
             std::swap(a, b);
         }
         if (!comp(a, b)) {
             return false;
         }
-        _leader[a] += _leader[b];
-        _leader[b] = a;
-        --_setCount;
+        _lead[a] += _lead[b];
+        _lead[b] = a;
+        --_set_count;
         return true;
     }
 
     auto _MergeTo(int from, int to) noexcept -> bool {
-        from = _GetLeader(from);
-        to = _GetLeader(to);
+        from = _Leader(from);
+        to = _Leader(to);
         if (from == to) {
             return false;
         }
-        _leader[to] += _leader[from];
-        _leader[from] = to;
-        --_setCount;
+        _lead[to] += _lead[from];
+        _lead[from] = to;
+        --_set_count;
         return true;
     }
 
 public:
-    auto GetLeader(int x) -> int {
+    auto Leader(int x) -> int {
         assert(_InRange(x));
-        return _GetLeader(x);
+        return _Leader(x);
     }
 
     auto IsLeader(int x) -> bool {
-        return GetLeader(x) != x;
+        return Leader(x) != x;
     }
 
     auto Count() const noexcept -> std::size_t {
-        return _setCount;
+        return _set_count;
     }
 
     auto Count(int x) -> int {
@@ -95,7 +95,7 @@ public:
     auto IsSame(int a, int b) -> bool {
         assert(_InRange(a));
         assert(_InRange(b));
-        return _GetLeader(a) == _GetLeader(b);
+        return _Leader(a) == _Leader(b);
     }
 
     auto IsSame(std::initializer_list<int> input_list) -> bool {
@@ -129,11 +129,11 @@ public:
     }
 
     auto Assign() -> void {
-        std::fill(_leader.begin(), _leader.end(), -1);
+        std::fill(_lead.begin(), _lead.end(), -1);
     }
 
     auto Assign(std::size_t size) -> void {
-        _leader.assign(size, -1);
-        _setCount = size;
+        _lead.assign(size, -1);
+        _set_count = size;
     }
 };
