@@ -27,7 +27,7 @@ int main() {
     std::vector<int> stk;
     std::vector<bool> inst(n * 2);
 
-    auto trajan = [&, stamp{0}](auto &self, int from) mutable -> void {
+    auto tarjan = [&, stamp{0}](auto &self, int from) mutable -> void {
         dfn[from] = low[from] = stamp;
         stamp += 1;
         stk.emplace_back(from);
@@ -56,7 +56,7 @@ int main() {
 
     for (int i = 0; i < n * 2; i += 1) {
         if (dfn[i] == -1) {
-            trajan(trajan, i);
+            tarjan(tarjan, i);
         }
     }
 
