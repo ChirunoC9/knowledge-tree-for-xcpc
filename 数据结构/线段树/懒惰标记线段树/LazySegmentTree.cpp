@@ -130,6 +130,25 @@ private:
         }
     }
 
+    template <typename RandomAccessIter, typename CoverFunc>
+        requires requires(CoverFunc cover, int l, int r,
+                          RandomAccessIter iter) {
+            { cover(l, r, *iter) } -> std::same_as<_Info>;
+        }
+    auto _RangeBuild(int l, int r, int id, RandomAccessIter first,
+                     RandomAccessIter last, const CoverFunc &cover) -> void {
+        _seg[id].lz.ResetTag();
+        if (l + 1 == r) {
+            _seg[id].val = cover(l, r, *first);
+            return;
+        }
+        auto mid = std::midpoint(l, r);
+        auto mid_it = first + (last - first) / 2;
+        _RangeBuild(l, mid, _LeftChild(id), first, mid, cover);
+        _RangeBuild(mid, r, _RightChild(id), mid, last, cover);
+        _Raise(id);
+    }
+
 public:
     auto Apply(int ml, int mr, const _Lazy &lazy) -> void {
         if (ml >= mr)
@@ -146,9 +165,75 @@ public:
     auto SetPosInfo(int target, const _Info &unit_val) -> void {
         _SetPosInfo(0, _n, _ROOT, target, unit_val);
     }
+
+    template <typename RandomAccessIter, typename CoverFunc>
+        requires requires(CoverFunc cover, int l, int r,
+                          RandomAccessIter iter) {
+            { cover(l, r, *iter) } -> std::same_as<_Info>;
+        }
+    auto RangeBuild(RandomAccessIter first, RandomAccessIter last,
+                    const CoverFunc &cover) -> void {
+        assert(std::distance(first, last) == _n);
+        _RangeBuild(0, _n, first, last, cover);
+    }
 };
 
 using i64 = int64_t;
+
+template <typename _Info, typename _Lazy>
+struct _NodeImpl {
+    using Info = _Info;
+    using Lazy = _Lazy;
+
+    __always_inline constexpr static auto Merge(const Info &left,
+                                                const Info &right) -> Info;
+
+    __always_inline constexpr static auto ApplyInfo(const Info &a,
+                                                    const Lazy &lz) -> Info;
+
+    __always_inline constexpr static auto ApplyTag(const Lazy &left,
+                                                   const Lazy &right) -> Lazy;
+};
+
+struct Info {
+    int l, r;
+    i64 val;
+    constexpr Info(int l = {}, int r = {}, i64 val = {})
+        : l(l), r(r), val(val) {}
+    constexpr int len() const {
+        return r - l;
+    }
+};
+struct Lazy {
+    i64 add;
+    constexpr Lazy(i64 add = {}) : add(add) {}
+    bool HaveTag() const {
+        return add != 0;
+    }
+    void ResetTag() {
+        add = 0;
+    }
+};
+
+template <>
+__always_inline constexpr auto _NodeImpl<Info, Lazy>::Merge(const Info &left,
+                                                            const Info &right)
+    -> Info {
+    return Info{left.l, right.r, left.val + right.val};
+}
+
+template <>
+__always_inline constexpr auto _NodeImpl<Info, Lazy>::ApplyInfo(const Info &a,
+                                                                const Lazy &lz)
+    -> Info {
+    return Info{a.l, a.r, a.val + lz.add & a.len()};
+}
+
+template <>
+__always_inline constexpr auto
+_NodeImpl<Info, Lazy>::ApplyTag(const Lazy &left, const Lazy &right) -> Lazy {
+    return Lazy{left.add + right.add};
+}
 
 struct NodeImpl {
     struct Info {
@@ -169,14 +254,17 @@ struct NodeImpl {
             add = 0;
         }
     };
-    static Info Merge(Info left, Info right) {
+
+    __always_inline static Info Merge(Info left, Info right) {
         return Info{left.l, right.r, left.val + right.val};
     }
-    static Info ApplyInfo(Info a, Lazy lz) {
+
+    __always_inline static Info ApplyInfo(Info a, Lazy lz) {
         a.val += lz.add * a.len();
         return a;
     }
-    static Lazy ApplyTag(Lazy a, Lazy b) {
+
+    __always_inline static Lazy ApplyTag(Lazy a, Lazy b) {
         return Lazy{a.add + b.add};
     }
 };
