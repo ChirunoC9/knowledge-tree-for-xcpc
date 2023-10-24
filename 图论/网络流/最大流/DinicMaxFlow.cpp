@@ -65,7 +65,9 @@ private:
             return total_flow;
 
         auto remain_flow = total_flow;
-        for (int& eid = _cur[from]; eid < (int)_adj[from].size(); eid += 1) {
+        for (int& eid = _cur[from];
+             eid < (int)_adj[from].size() && remain_flow > 0;
+             eid += 1) {
             auto& [to, cap, rev_eid] = _adj[from][eid];
             if (cap > 0 && _level[to] == _level[from] + 1) {
                 auto ret = _Dfs(to, std::min<_Capacity>(remain_flow, cap));
@@ -94,7 +96,7 @@ public:
 
     auto AddEdge(int from, int to, _Capacity cap) -> void {
         int eidx = _AddEdge(from, to, cap, _adj[to].size());
-        _AddEdge(to, from, _Capacity{}, eidx);
+        int rev_eidx = _AddEdge(to, from, _Capacity{}, eidx);
     }
 
     auto AddUEdge(int from, int to, _Capacity cap) -> void {
@@ -102,7 +104,7 @@ public:
         _AddEdge(to, from, cap, eidx);
     }
 
-    auto GetMaxFlow(_Capacity inf = std::numeric_limits<_Capacity>::max())
+    auto GetMaxFlow(_Capacity inf = std::numeric_limits<_Capacity>::max() / 2)
         -> _Capacity {
         _Capacity flow = {};
         while (_Bfs()) {
@@ -135,34 +137,27 @@ public:
     }
 };
 
+using i64 = int64_t;
+
 int main() {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
 
-    int L, R, M;
-    std::cin >> L >> R >> M;
+    int n, m, s, t;
+    std::cin >> n >> m >> s >> t;
+    s -= 1;
+    t -= 1;
 
-    DinicMaxFlow<int> max_flow(L + R + 2, L + R, L + R + 1);
+    DinicMaxFlow<i64> max_flow(n, s, t);
 
-    for (int i = 0; i < L; i += 1) {
-        max_flow.AddEdge(max_flow.Source(), i, 1);
-    }
-    for (int i = 0; i < R; i += 1) {
-        max_flow.AddEdge(i + L, max_flow.Sink(), 1);
-    }
-    for (int i = 0; i < M; i += 1) {
-        int u, v;
-        std::cin >> u >> v;
-        max_flow.AddEdge(u, v + L, 1);
+    for (int i = 0; i < m; i += 1) {
+        int from, to;
+        i64 cap;
+        std::cin >> from >> to >> cap;
+        from -= 1;
+        to -= 1;
+        max_flow.AddEdge(from, to, cap);
     }
 
     std::cout << max_flow.GetMaxFlow() << '\n';
-    for (int i = 0; i < L; i += 1) {
-        for (auto&& [to, cap, rev] : max_flow[i]) {
-            if (to >= L && to < L + R && cap == 0) {
-                std::cout << i << ' ' << to - L << '\n';
-                break;
-            }
-        }
-    }
 }
