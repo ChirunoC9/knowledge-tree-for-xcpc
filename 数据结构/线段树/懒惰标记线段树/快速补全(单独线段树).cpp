@@ -23,13 +23,16 @@ struct Node {
     Lazy lz;
 } seg[MAX_N * 4];
 
-__always_inline void rise(int id) {
+__attribute__ ((__always_inline__))
+void rise(int id) {
     seg[id].val = seg[id * 2].val + seg[id * 2 + 1].val;
 }
-__always_inline void update(int l, int r, int id, const Lazy &lz) {
+__attribute__ ((__always_inline__))
+void update(int l, int r, int id, const Lazy &lz) {
 
 }
-__always_inline void down(int l, int r, int id) {
+__attribute__ ((__always_inline__))
+void down(int l, int r, int id) {
     if (auto &lz = seg[id].lz; lz.HaveTag()) {
         auto mid = l + (r - l) / 2;
         update(l, mid, id * 2, lz);
